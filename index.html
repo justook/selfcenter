@@ -28,11 +28,20 @@
             font-family: 'Inter', 'Segoe UI', 'PingFang SC', sans-serif;
             background: var(--bg-gradient);
             background-size: 400% 400%;
+            background-attachment: fixed; /* 背景固定 */
             animation: gradientBG 15s ease infinite; /* 动态背景 */
             color: var(--text-main);
             min-height: 100vh;
             padding: 20px;
             overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* 自定义背景图样式覆盖 */
+        body.custom-bg {
+            background-size: cover;
+            background-position: center;
+            animation: none;
         }
 
         @keyframes gradientBG {
@@ -68,6 +77,7 @@
             grid-template-areas: 
                 "header header header"
                 "sidebar main extra";
+            padding-bottom: 60px; /* 为底部设置按钮留空 */
         }
 
         @media (max-width: 900px) {
@@ -499,16 +509,17 @@
             pointer-events: auto;
         }
         .modal-content {
-            background: rgba(25, 25, 35, 0.9);
-            border: 1px solid var(--primary);
+            background: rgba(25, 25, 35, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 40px;
             border-radius: 20px;
             text-align: center;
-            box-shadow: 0 0 50px rgba(0, 242, 234, 0.3);
+            box-shadow: 0 0 50px rgba(0, 242, 234, 0.1);
             transform: scale(0.8);
             transition: transform 0.3s ease;
             max-width: 400px;
             width: 90%;
+            position: relative; /* Fixed: 确保内部绝对定位元素相对于此容器定位 */
         }
         .modal-overlay.show .modal-content { transform: scale(1); }
         .modal-content h2, .modal-content h3 { margin-bottom: 15px; color: var(--primary); justify-content: center; }
@@ -704,6 +715,120 @@
         .trend-link:hover { color: var(--primary); }
         .trend-score { font-size: 12px; color: var(--text-sec); }
 
+
+        /* --- 设置浮动按钮 --- */
+        .settings-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .settings-fab:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: var(--primary);
+            color: #000;
+        }
+
+        /* --- 设置模态框 (增强版) --- */
+        #configModal .modal-content {
+            max-width: 800px;
+            width: 90%;
+            padding: 0; /* 自定义布局 */
+            display: flex;
+            height: 500px;
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .config-sidebar {
+            width: 200px;
+            background: rgba(0,0,0,0.2);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        .config-tab {
+            padding: 15px 20px;
+            color: var(--text-sec);
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .config-tab:hover, .config-tab.active {
+            background: rgba(255,255,255,0.05);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+        }
+        .config-tab.active { font-weight: bold; }
+
+        .config-main {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+        .config-section { display: none; }
+        .config-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .config-header {
+            font-size: 20px; font-weight: bold; margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
+            color: #fff;
+        }
+
+        /* 开关样式 */
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+        }
+        .toggle-label { font-size: 14px; }
+        
+        .switch {
+            position: relative; display: inline-block; width: 40px; height: 20px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #555; transition: .4s; border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 16px; width: 16px;
+            left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .close-config-btn {
+            position: absolute; top: 15px; right: 20px;
+            background: none; border: none; color: var(--text-sec);
+            font-size: 24px; cursor: pointer; z-index: 1001; /* 提高层级 */
+        }
+        .close-config-btn:hover { color: #fff; }
+
+        /* 隐藏模块通用类 */
+        .module-hidden { display: none !important; }
+
     </style>
 </head>
 <body>
@@ -712,17 +837,24 @@
     <div class="bg-blob blob-1"></div>
     <div class="bg-blob blob-2"></div>
 
+    <!-- 设置入口按钮 -->
+    <button class="settings-fab" onclick="openConfigModal()" title="全局设置">
+        <i class="ph-bold ph-gear"></i>
+    </button>
+
     <div class="container">
         
         <!-- 1. 顶部Header -->
-        <div class="card header">
-            <div class="clock-box">
+        <div class="card header" id="headerCard">
+            <div class="clock-box" id="clockCard">
                 <h1 id="clock">00:00</h1>
                 <p id="date">LOADING...</p>
+                <!-- 农历显示 -->
+                <p id="lunarDate" style="font-size: 12px; color: var(--primary); margin-top: 2px; opacity: 0.8; display: none;">农历加载中...</p>
             </div>
             
             <!-- 搜索模块 -->
-            <div class="search-box-wrapper">
+            <div class="search-box-wrapper" id="searchCard">
                 <div class="search-container" id="searchContainer">
                     <button class="search-trigger" onclick="toggleSearch()" title="搜索">
                         <i class="ph-bold ph-magnifying-glass"></i>
@@ -742,7 +874,7 @@
                 </div>
             </div>
 
-            <div class="weather-wrapper">
+            <div class="weather-wrapper" id="weatherCard">
                 <!-- 天气显示区域 -->
                 <div class="weather-box" onclick="openLocModal()">
                     <div class="weather-icon-box" id="w-icon">
@@ -804,7 +936,7 @@
                 </div>
             </div>
 
-            <div class="card pomodoro-container">
+            <div class="card pomodoro-container" id="pomoCard">
                 <h3><span class="title-text">⏳ 专注时刻</span></h3>
 
                 <!-- 倒计时圆环 -->
@@ -878,7 +1010,7 @@
         </div>
 
         <!-- 3. 中间栏 (ToDo 增强) -->
-        <div class="main-content">
+        <div class="main-content" id="todoCard">
             <div class="card" style="min-height: 100%;">
                 <h3><span class="title-text">📝 任务计划</span></h3>
                 <div class="tabs">
@@ -910,7 +1042,7 @@
 
         <!-- 4. 右侧栏 -->
         <div class="extra-content">
-            <div class="card music-card">
+            <div class="card music-card" id="musicCard">
                 <h3><span class="title-text">🎧 QQ 音乐</span></h3>
                 <div class="vinyl-record" id="vinyl">
                     <div class="vinyl-inner"></div>
@@ -919,7 +1051,7 @@
                 <a href="https://y.qq.com/" target="_blank" class="music-link" onclick="startVinyl()">前往播放器</a>
             </div>
 
-            <div class="card">
+            <div class="card" id="weiboCard">
                 <h3><span class="title-text">🔥 微博热搜</span></h3>
                 <ul class="trend-list" id="newsList">
                     <!-- JS 生成 -->
@@ -927,7 +1059,7 @@
                 <div id="newsUpdate" style="text-align: right; font-size: 10px; color: var(--text-sec); margin-top: 10px;"></div>
             </div>
 
-            <div class="card">
+            <div class="card" id="newsCard">
                 <h3><span class="title-text">📰 热点资讯</span></h3>
                 <ul class="trend-list">
                     <li class="trend-item"><a href="#" class="trend-link">科技：GPT-5 即将发布预览</a></li>
@@ -939,7 +1071,303 @@
 
     </div>
 
+    <!-- 全局设置模态框 -->
+    <div id="configModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-config-btn" onclick="closeConfigModal()">×</button>
+            <div class="config-sidebar">
+                <div class="config-tab active" onclick="switchConfigTab('all')"><i class="ph-bold ph-sliders-horizontal"></i> 全部</div>
+                <div class="config-tab" onclick="switchConfigTab('time')"><i class="ph-bold ph-clock"></i> 时间模块</div>
+                <div class="config-tab" onclick="switchConfigTab('search')"><i class="ph-bold ph-magnifying-glass"></i> 搜索模块</div>
+                <div class="config-tab" onclick="switchConfigTab('weather')"><i class="ph-bold ph-cloud"></i> 天气模块</div>
+                <div class="config-tab" onclick="switchConfigTab('quick')"><i class="ph-bold ph-lightning"></i> 快速访问</div>
+                <div class="config-tab" onclick="switchConfigTab('task')"><i class="ph-bold ph-list-checks"></i> 任务计划</div>
+                <div class="config-tab" onclick="switchConfigTab('music')"><i class="ph-bold ph-music-note"></i> 音乐模块</div>
+                <div class="config-tab" onclick="switchConfigTab('pomo')"><i class="ph-bold ph-hourglass"></i> 番茄时钟</div>
+                <div class="config-tab" onclick="switchConfigTab('weibo')"><i class="ph-bold ph-fire"></i> 微博热搜</div>
+                <div class="config-tab" onclick="switchConfigTab('news')"><i class="ph-bold ph-newspaper"></i> 热点资讯</div>
+                <div class="config-tab" onclick="switchConfigTab('about')"><i class="ph-bold ph-info"></i> 关于</div>
+            </div>
+            
+            <div class="config-main">
+                <!-- 全部 -->
+                <div id="cfg-all" class="config-section active">
+                    <div class="config-header">全部设置</div>
+                    <div class="input-group">
+                        <label class="toggle-label" style="display:block; margin-bottom:5px;">页面背景</label>
+                        <select id="cfgBgType" class="search-select" style="width:100%; padding:10px; background:rgba(0,0,0,0.3); border:1px solid #444;" onchange="handleBgChange()">
+                            <option value="default">默认 (动态渐变)</option>
+                            <option value="custom">自定义图片</option>
+                        </select>
+                        <input type="text" id="cfgBgUrl" placeholder="输入图片 URL..." style="display:none; margin-top:10px;" onchange="handleBgChange()">
+                    </div>
+                </div>
+
+                <!-- 时间 -->
+                <div id="cfg-time" class="config-section">
+                    <div class="config-header">时间模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-clockCard" onchange="toggleModule('clockCard')"><span class="slider"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示日期 (阳历)</span>
+                        <label class="switch"><input type="checkbox" id="chk-date" onchange="toggleDateDisplay()"><span class="slider"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示阴历 (农历)</span>
+                        <label class="switch"><input type="checkbox" id="chk-lunar" onchange="toggleDateDisplay()"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 搜索 -->
+                <div id="cfg-search" class="config-section">
+                    <div class="config-header">搜索模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-searchCard" onchange="toggleModule('searchCard')"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 天气 -->
+                <div id="cfg-weather" class="config-section">
+                    <div class="config-header">天气模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-weatherCard" onchange="toggleModule('weatherCard')"><span class="slider"></span></label>
+                    </div>
+                    <div class="input-group" style="margin-top:20px;">
+                        <label style="font-size:12px; color:#aaa;">高德地图 API Key (Web服务)</label>
+                        <input type="text" id="cfgAmapKey" placeholder="输入 Key..." onchange="saveAmapKey()">
+                    </div>
+                </div>
+
+                <!-- 快速访问 -->
+                <div id="cfg-quick" class="config-section">
+                    <div class="config-header">快速访问模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-shortcutsCard" onchange="toggleModule('shortcutsCard')"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 任务计划 -->
+                <div id="cfg-task" class="config-section">
+                    <div class="config-header">任务计划模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-todoCard" onchange="toggleModule('todoCard')"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 音乐 -->
+                <div id="cfg-music" class="config-section">
+                    <div class="config-header">音乐模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-musicCard" onchange="toggleModule('musicCard')"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 番茄时钟 -->
+                <div id="cfg-pomo" class="config-section">
+                    <div class="config-header">番茄时钟模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-pomoCard" onchange="toggleModule('pomoCard')"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 微博热搜 -->
+                <div id="cfg-weibo" class="config-section">
+                    <div class="config-header">微博热搜模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-weiboCard" onchange="toggleModule('weiboCard')"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 热点资讯 -->
+                <div id="cfg-news" class="config-section">
+                    <div class="config-header">热点资讯模块</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">显示模块</span>
+                        <label class="switch"><input type="checkbox" id="chk-newsCard" onchange="toggleModule('newsCard')"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 关于 -->
+                <div id="cfg-about" class="config-section">
+                    <div class="config-header">关于</div>
+                    <div style="text-align:center; margin-top:40px;">
+                        <h2 style="color:#fff; font-family:'Courier New', monospace;">CyberFocus</h2>
+                        <p style="color:var(--primary); font-size:18px;">v0.4.0</p>
+                        <p style="color:#aaa; font-size:12px; margin-top:20px;">Designed for Productivity & Aesthetics.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
+    // --- 0. 全局配置逻辑 (NEW) ---
+    // 默认配置
+    const defaultConfig = {
+        bgType: 'default', // default | custom
+        bgUrl: '',
+        showDate: true,
+        showLunar: false,
+        amapKey: 'c0a1a7a74be675ec71f73f3be7463166', // 默认Key
+        modules: {
+            clockCard: true,
+            searchCard: true,
+            weatherCard: true,
+            shortcutsCard: true,
+            todoCard: true,
+            musicCard: true,
+            pomoCard: true,
+            weiboCard: true,
+            newsCard: true
+        }
+    };
+
+    // 读取配置
+    let appConfig = JSON.parse(localStorage.getItem('cyberAppConfig')) || defaultConfig;
+    
+    // 合并可能缺少的新字段（防止更新后报错）
+    appConfig = { ...defaultConfig, ...appConfig, modules: { ...defaultConfig.modules, ...appConfig.modules } };
+
+    function saveConfig() {
+        localStorage.setItem('cyberAppConfig', JSON.stringify(appConfig));
+    }
+
+    // 应用所有配置到 UI
+    function applyAppConfig() {
+        // 1. 背景
+        const body = document.body;
+        if (appConfig.bgType === 'custom' && appConfig.bgUrl) {
+            body.style.backgroundImage = `url('${appConfig.bgUrl}')`;
+            body.classList.add('custom-bg');
+        } else {
+            body.style.backgroundImage = '';
+            body.classList.remove('custom-bg');
+        }
+
+        // 2. 模块显隐
+        for (const [id, visible] of Object.entries(appConfig.modules)) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (visible) el.classList.remove('module-hidden');
+                else el.classList.add('module-hidden');
+            }
+        }
+
+        // 3. 时间日期
+        toggleDateDisplayUI();
+
+        // 4. 更新 Input 状态 (用于设置面板回显)
+        updateConfigInputs();
+    }
+
+    function updateConfigInputs() {
+        // 背景
+        document.getElementById('cfgBgType').value = appConfig.bgType;
+        document.getElementById('cfgBgUrl').value = appConfig.bgUrl || '';
+        document.getElementById('cfgBgUrl').style.display = appConfig.bgType === 'custom' ? 'block' : 'none';
+
+        // 模块开关
+        for (const [id, visible] of Object.entries(appConfig.modules)) {
+            const chk = document.getElementById('chk-' + id);
+            if(chk) chk.checked = visible;
+        }
+
+        // 其它
+        document.getElementById('chk-date').checked = appConfig.showDate;
+        document.getElementById('chk-lunar').checked = appConfig.showLunar;
+        document.getElementById('cfgAmapKey').value = appConfig.amapKey;
+    }
+
+    // --- 设置面板交互逻辑 ---
+    function openConfigModal() {
+        updateConfigInputs(); // 打开前刷新状态
+        document.getElementById('configModal').classList.add('show');
+    }
+    function closeConfigModal() {
+        document.getElementById('configModal').classList.remove('show');
+    }
+
+    function switchConfigTab(tabName) {
+        // 侧边栏样式
+        document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        // 内容区切换
+        document.querySelectorAll('.config-section').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById('cfg-' + tabName);
+        if (target) target.classList.add('active');
+    }
+
+    // 背景设置
+    function handleBgChange() {
+        const type = document.getElementById('cfgBgType').value;
+        const url = document.getElementById('cfgBgUrl').value;
+        
+        appConfig.bgType = type;
+        appConfig.bgUrl = url;
+        
+        document.getElementById('cfgBgUrl').style.display = type === 'custom' ? 'block' : 'none';
+        
+        saveConfig();
+        applyAppConfig();
+    }
+
+    // 模块开关通用函数
+    function toggleModule(moduleId) {
+        const isChecked = document.getElementById('chk-' + moduleId).checked;
+        appConfig.modules[moduleId] = isChecked;
+        saveConfig();
+        applyAppConfig();
+    }
+
+    // 日期显示设置
+    function toggleDateDisplay() {
+        appConfig.showDate = document.getElementById('chk-date').checked;
+        appConfig.showLunar = document.getElementById('chk-lunar').checked;
+        saveConfig();
+        applyAppConfig(); // 触发 UI 更新
+    }
+
+    function toggleDateDisplayUI() {
+        const dateEl = document.getElementById('date');
+        const lunarEl = document.getElementById('lunarDate');
+        
+        if (appConfig.showDate) {
+            dateEl.style.display = 'block';
+        } else {
+            dateEl.style.display = 'none';
+        }
+
+        if (appConfig.showLunar) {
+            lunarEl.style.display = 'block';
+            updateLunarDate(); // 确保有数据
+        } else {
+            lunarEl.style.display = 'none';
+        }
+    }
+
+    // 天气 API 设置
+    function saveAmapKey() {
+        const key = document.getElementById('cfgAmapKey').value.trim();
+        if (key) {
+            appConfig.amapKey = key;
+            saveConfig();
+            // 重新初始化天气
+            weatherConfig.amapKey = key; // 更新内存中的 key
+            initWeather(); 
+        }
+    }
+
+
     // --- 搜索模块逻辑 ---
     function toggleSearch() {
         const container = document.getElementById('searchContainer');
@@ -1089,7 +1517,7 @@
     renderShortcuts();
 
 
-    // --- 1. 时钟逻辑 ---
+    // --- 1. 时钟逻辑 (升级：支持农历) ---
     function updateClock() {
         const now = new Date();
         const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
@@ -1097,7 +1525,31 @@
         
         document.getElementById('clock').innerText = timeStr;
         document.getElementById('date').innerText = dateStr;
+
+        // 如果开启了农历显示
+        if (appConfig.showLunar) {
+            updateLunarDate(now);
+        }
     }
+    
+    function updateLunarDate(dateObj) {
+        // 使用 Intl API 获取农历信息 (浏览器原生支持)
+        try {
+            const date = dateObj || new Date();
+            const lunarDate = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }).format(date);
+            // 格式化输出: 2024年三月18 -> 甲辰年三月十八 (简单处理)
+            // 兼容不同浏览器格式，尝试提取汉字日期部分
+            const cleanLunar = lunarDate.replace(/\d+年/, '').replace(/(\d{4})|([a-zA-Z]+)/g, '');
+            document.getElementById('lunarDate').innerText = "农历 " + cleanLunar;
+        } catch (e) {
+            document.getElementById('lunarDate').innerText = "";
+        }
+    }
+
     setInterval(updateClock, 1000);
     updateClock();
 
@@ -1772,14 +2224,13 @@
     updateWeiboTrends();
     setInterval(updateWeiboTrends, 600000);
     
-    // --- 6. 高德天气系统 (Web 服务 API REST 版) ---
+    // --- 6. 高德天气系统 (Web 服务 API REST 版 + CORS Proxy) ---
     const weatherConfig = {
         adcode: localStorage.getItem('amap_adcode') || '110000', // 默认北京
-        city: localStorage.getItem('amap_city') || '北京市'
+        city: localStorage.getItem('amap_city') || '北京市',
+        amapKey: appConfig.amapKey // 初始读取配置中的Key
     };
     
-    const AMAP_KEY = 'c0a1a7a74be675ec71f73f3be7463166';
-
     function getAmapString(val) {
         if (Array.isArray(val)) {
             return val.length > 0 ? val[0] : "";
@@ -1792,11 +2243,21 @@
     }
 
     async function fetchWeather(adcode, fallbackCityName) {
-        const url = `https://restapi.amap.com/v3/weather/weatherInfo?city=${adcode}&key=${AMAP_KEY}`;
+        const targetUrl = `https://restapi.amap.com/v3/weather/weatherInfo?city=${adcode}&key=${appConfig.amapKey}`;
         
         try {
-            const res = await fetch(url);
-            const data = await res.json();
+            let data;
+            try {
+                // 优先尝试直连
+                const res = await fetch(targetUrl);
+                if(!res.ok) throw new Error("Direct fetch failed");
+                data = await res.json();
+            } catch (err) {
+                 // 回退到代理
+                 const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                 const resProxy = await fetch(proxyUrl);
+                 data = await resProxy.json();
+            }
 
             if (data.status === "1" && data.lives && data.lives.length > 0) {
                 const live = data.lives[0];
@@ -1804,7 +2265,7 @@
             } else {
                 console.error("天气数据错误", data);
                 if (data.infocode === "10001") {
-                    document.getElementById('w-tip').innerText = "Key无效，请检查配置";
+                    document.getElementById('w-tip').innerText = "Key无效，请在设置中检查";
                 } else if (data.infocode === "10003") {
                      document.getElementById('w-tip').innerText = "Key类型错误(平台不匹配)";
                 } else {
@@ -1812,8 +2273,8 @@
                 }
             }
         } catch (e) {
-            console.error("网络请求失败", e);
-            document.getElementById('w-tip').innerText = "网络连接异常";
+            console.error(e);
+            document.getElementById('w-tip').innerText = "网络连接异常 (CORS/Proxy)";
         }
     }
 
@@ -1871,11 +2332,21 @@
 
         msg.innerText = "搜索中...";
         
-        const url = `https://restapi.amap.com/v3/config/district?keywords=${encodeURIComponent(keyword)}&subdistrict=0&extensions=base&key=${AMAP_KEY}`;
+        const targetUrl = `https://restapi.amap.com/v3/config/district?keywords=${encodeURIComponent(keyword)}&subdistrict=0&extensions=base&key=${appConfig.amapKey}`;
 
         try {
-            const res = await fetch(url);
-            const data = await res.json();
+            let data;
+            try {
+                // 优先尝试直连
+                const res = await fetch(targetUrl);
+                if(!res.ok) throw new Error("Direct fetch failed");
+                data = await res.json();
+            } catch (err) {
+                 // 回退到代理
+                 const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                 const resProxy = await fetch(proxyUrl);
+                 data = await resProxy.json();
+            }
 
             if (data.status === "1" && data.districts && data.districts.length > 0) {
                 const cityData = data.districts[0];
@@ -1904,7 +2375,7 @@
             }
         } catch (e) {
             console.error(e);
-            msg.innerText = "搜索请求失败";
+            msg.innerText = "搜索请求失败 (CORS/Proxy)";
         }
     }
 
@@ -1920,6 +2391,18 @@
         if(e.key === 'Enter') searchLocation();
     }
 
+    // --- ESC 关闭所有弹窗 (新增) ---
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const openModals = document.querySelectorAll('.modal-overlay.show');
+            openModals.forEach(modal => {
+                modal.classList.remove('show');
+            });
+        }
+    });
+
+    // 初始化调用 (放到最后确保 Config 变量已就绪)
+    applyAppConfig(); 
     initWeather();
     setInterval(() => {
         fetchWeather(weatherConfig.adcode, weatherConfig.city);
