@@ -754,6 +754,81 @@
             font-weight: bold;
         }
 
+        /* --- 灵感与娱乐 (原推荐阅读) 样式 --- */
+        .saying-text {
+            font-size: 16px;
+            line-height: 1.6;
+            font-style: italic;
+            text-align: center;
+            color: #fff;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+            opacity: 0.9;
+        }
+        
+        .answer-text {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: bold;
+            min-height: 30px;
+            animation: fadeIn 0.5s;
+            text-shadow: 0 0 10px rgba(0, 242, 234, 0.3);
+        }
+
+        /* --- 答案之书美化 (New) --- */
+        .answer-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* 增加间距 */
+            margin-bottom: 15px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px; /* 大圆角 */
+            color: #fff;
+            font-size: 14px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .answer-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 242, 234, 0.3); /* 聚焦光晕 */
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .answer-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px; /* 大圆角 */
+            border: none;
+            background: linear-gradient(90deg, var(--primary), #269e63);
+            color: #000;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 242, 234, 0.2);
+        }
+
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 234, 0.4);
+            filter: brightness(1.1);
+        }
 
         /* --- 设置浮动按钮 --- */
         .settings-fab {
@@ -1192,13 +1267,28 @@
                 <div id="newsUpdate" style="text-align: right; font-size: 10px; color: var(--text-sec); margin-top: 10px;"></div>
             </div>
 
+            <!-- 灵感与娱乐模块 (替换原推荐阅读) -->
             <div class="card" id="newsCard">
-                <h3><span class="title-text">📰 推荐阅读</span></h3>
-                <ul class="trend-list">
-                    <li class="trend-item"><a href="#" class="trend-link">科技：GPT-5 即将发布预览</a></li>
-                    <li class="trend-item"><a href="#" class="trend-link">财经：全球股市最新动态</a></li>
-                    <li class="trend-item"><a href="#" class="trend-link">体育：F1 上海站大奖赛</a></li>
-                </ul>
+                <h3>
+                    <span class="title-text" id="inspirationTitle">💡 每日灵感</span> 
+                    <button class="header-btn" onclick="refreshInspiration()" title="刷新"><i class="ph-bold ph-arrows-clockwise"></i></button>
+                </h3>
+                
+                <!-- 随机名言模式 -->
+                <div id="sayingContainer" style="display:none;">
+                    <p id="sayingText" class="saying-text">正在获取灵感...</p>
+                </div>
+
+                <!-- 答案之书模式 -->
+                <div id="answerBookContainer" style="display:none;">
+                    <div class="answer-wrapper">
+                        <input type="text" id="answerQuestion" class="answer-input" placeholder="默念问题，点击指引..." onkeypress="handleAnswerKey(event)">
+                        <button class="answer-btn" onclick="askAnswerBook()">
+                            <i class="ph-bold ph-crystal-ball"></i> 寻求指引
+                        </button>
+                    </div>
+                    <div id="answerResult" class="answer-text"></div>
+                </div>
             </div>
         </div>
 
@@ -1218,7 +1308,7 @@
                 <div class="config-tab" onclick="switchConfigTab('music')"><i class="ph-bold ph-music-note"></i> 音乐模块</div>
                 <div class="config-tab" onclick="switchConfigTab('pomo')"><i class="ph-bold ph-hourglass"></i> 番茄时钟</div>
                 <div class="config-tab" onclick="switchConfigTab('weibo')"><i class="ph-bold ph-fire"></i> 热榜源设置</div>
-                <div class="config-tab" onclick="switchConfigTab('news')"><i class="ph-bold ph-newspaper"></i> 推荐阅读</div>
+                <div class="config-tab" onclick="switchConfigTab('news')"><i class="ph-bold ph-magic-wand"></i> 灵感与娱乐</div>
                 <div class="config-tab" onclick="switchConfigTab('about')"><i class="ph-bold ph-info"></i> 关于</div>
             </div>
             
@@ -1332,12 +1422,29 @@
                     </div>
                 </div>
 
-                <!-- 热点资讯 -->
+                <!-- 灵感与娱乐 (原推荐阅读) -->
                 <div id="cfg-news" class="config-section">
-                    <div class="config-header">推荐阅读模块</div>
+                    <div class="config-header">灵感与娱乐</div>
                     <div class="toggle-row">
                         <span class="toggle-label">显示模块</span>
                         <label class="switch"><input type="checkbox" id="chk-newsCard" onchange="toggleModule('newsCard')"><span class="slider"></span></label>
+                    </div>
+                    
+                    <div class="input-group" style="margin-top:20px; background:rgba(255,255,255,0.02); padding:15px; border-radius:8px;">
+                        <label class="toggle-label" style="display:block; margin-bottom:15px; color:var(--primary);">功能模式选择</label>
+                        <div style="display:flex; gap:20px;">
+                            <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                <input type="radio" name="inspirationMode" value="saying" onchange="handleInspirationModeChange(this)" style="width:auto;">
+                                💡 随机名言
+                            </label>
+                            <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                <input type="radio" name="inspirationMode" value="answerbook" onchange="handleInspirationModeChange(this)" style="width:auto;">
+                                📖 答案之书
+                            </label>
+                        </div>
+                        <p style="margin-top:10px; font-size:12px; color:var(--text-sec);" id="inspirationDesc">
+                            每次刷新随机获取一句名言或诗词。
+                        </p>
                     </div>
                 </div>
 
@@ -1346,7 +1453,7 @@
                     <div class="config-header">关于</div>
                     <div style="text-align:center; margin-top:40px;">
                         <h2 style="color:#fff; font-family:'Courier New', monospace;">CyberFocus</h2>
-                        <p style="color:var(--primary); font-size:18px;">v0.4.0</p>
+                        <p style="color:var(--primary); font-size:18px;">v0.6.0</p>
                         <p style="color:#aaa; font-size:12px; margin-top:20px;">Designed for Productivity & Aesthetics.</p>
                     </div>
                 </div>
@@ -1378,6 +1485,7 @@
         autoMoveDone: false, // New property
         amapKey: 'c0a1a7a74be675ec71f73f3be7463166', // 默认Key
         trendSources: ['weibo'], // 默认只有微博
+        inspirationMode: 'saying', // 'saying' | 'answerbook'
         modules: {
             clockCard: true,
             searchCard: true,
@@ -1387,7 +1495,7 @@
             musicCard: true,
             pomoCard: true,
             weiboCard: true,
-            newsCard: true
+            newsCard: true // 此时 newsCard 代表 灵感与娱乐模块
         }
     };
 
@@ -1435,6 +1543,9 @@
 
         // 5. 更新热榜 Tabs
         renderTrendTabs();
+
+        // 6. 初始化灵感模块
+        initInspirationModule();
     }
 
     function updateConfigInputs() {
@@ -1454,6 +1565,12 @@
         document.getElementById('chk-lunar').checked = appConfig.showLunar;
         document.getElementById('chk-autoMoveDone').checked = appConfig.autoMoveDone; // New line
         document.getElementById('cfgAmapKey').value = appConfig.amapKey;
+        
+        // 灵感模式回显
+        const mode = appConfig.inspirationMode || 'saying';
+        const radio = document.querySelector(`input[name="inspirationMode"][value="${mode}"]`);
+        if(radio) radio.checked = true;
+        updateInspirationDesc(mode);
         
         // 热榜源
         renderTrendSettings();
@@ -2764,7 +2881,108 @@
         if(e.key === 'Enter') searchLocation();
     }
 
-    // --- 7. 每日新闻摘要逻辑 (新增) ---
+    // --- 7. 灵感与娱乐模块 (NEW: 随机名言 & 答案之书) ---
+    function initInspirationModule() {
+        const mode = appConfig.inspirationMode || 'saying';
+        const titleEl = document.getElementById('inspirationTitle');
+        const sayingContainer = document.getElementById('sayingContainer');
+        const answerContainer = document.getElementById('answerBookContainer');
+
+        if (mode === 'saying') {
+            titleEl.innerHTML = '💡 每日灵感';
+            sayingContainer.style.display = 'block';
+            answerContainer.style.display = 'none';
+            // 如果名言是空的，加载一次
+            if (document.getElementById('sayingText').innerText.includes('正在获取')) {
+                fetchSaying();
+            }
+        } else {
+            titleEl.innerHTML = '📖 答案之书';
+            sayingContainer.style.display = 'none';
+            answerContainer.style.display = 'block';
+        }
+    }
+
+    function handleInspirationModeChange(radio) {
+        appConfig.inspirationMode = radio.value;
+        saveConfig();
+        updateInspirationDesc(radio.value);
+        initInspirationModule(); // 立即应用 UI 变更
+    }
+
+    function updateInspirationDesc(mode) {
+        const descEl = document.getElementById('inspirationDesc');
+        if (mode === 'saying') {
+            descEl.innerText = "每次刷新随机获取一句名言或诗词。";
+        } else {
+            descEl.innerText = "默念你的问题，然后点击按钮，获取神秘指引。";
+        }
+    }
+
+    // 刷新/操作入口
+    function refreshInspiration() {
+        const mode = appConfig.inspirationMode || 'saying';
+        if (mode === 'saying') {
+            fetchSaying();
+        } else {
+            // 答案之书刷新可以清空结果
+            document.getElementById('answerQuestion').value = '';
+            document.getElementById('answerResult').innerText = '';
+        }
+    }
+
+    async function fetchSaying() {
+        const textEl = document.getElementById('sayingText');
+        textEl.style.opacity = 0.5;
+        
+        try {
+            const res = await fetch('https://uapis.cn/api/v1/saying');
+            const data = await res.json();
+            if (data && data.text) {
+                textEl.innerText = data.text;
+            } else {
+                throw new Error("No Text");
+            }
+        } catch (e) {
+            textEl.innerText = "生活原本沉闷，但跑起来就有风。"; // Fallback
+        } finally {
+            textEl.style.opacity = 1;
+        }
+    }
+
+    async function askAnswerBook() {
+        const input = document.getElementById('answerQuestion');
+        const resultEl = document.getElementById('answerResult');
+        const question = input.value.trim();
+
+        if (!question) {
+            alert("请先在心中默念问题，并输入关键词...");
+            return;
+        }
+
+        resultEl.innerText = "🔮 感应中...";
+        
+        try {
+            const res = await fetch(`https://uapis.cn/api/v1/answerbook/ask?question=${encodeURIComponent(question)}`);
+            const data = await res.json();
+            
+            if (data.code === 200 && data.answer) {
+                resultEl.innerText = data.answer;
+            } else {
+                resultEl.innerText = "迷雾重重，请稍后再试";
+            }
+        } catch (e) {
+            console.error(e);
+            resultEl.innerText = "连接宇宙失败";
+        }
+    }
+
+    function handleAnswerKey(e) {
+        if (e.key === 'Enter') askAnswerBook();
+    }
+
+
+    // --- 每日新闻摘要逻辑 ---
     function checkNewsStatus() {
         const lastView = localStorage.getItem('cyberNewsLastView');
         const today = new Date().toDateString();
